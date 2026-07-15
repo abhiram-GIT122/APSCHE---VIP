@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, List , Any
 
 
 class SettlementCreate(BaseModel):
@@ -15,7 +15,7 @@ class SettlementResponse(BaseModel):
     settlement_percentage: float
     savings_amount: float
     rationale: Optional[str] = None
-    risk_factors: Optional[Dict[str, Any]] = None
+    risk_factors: Optional[list[str, Any]] = None
     ai_analysis: Optional[str] = None
     repayment_plan_months: Optional[int] = None
     is_accepted: int
