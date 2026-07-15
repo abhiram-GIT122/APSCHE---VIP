@@ -1,33 +1,21 @@
-from datetime import datetime
-from decimal import Decimal
-from sqlalchemy import ForeignKey, String, Numeric, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.base import Base
+"""Settlement recommendation model for AI-generated settlement suggestions."""
+from sqlalchemy import Column, Integer, Float, String, Text, DateTime, ForeignKey, JSON
+from sqlalchemy.sql import func
+from app.database import Base
 
-class Settlement(Base):
-    """Stores AI generated settlement terms, target discount thresholds, and risk analysis metrics."""
-    __tablename__ = "settlements"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    loan_id: Mapped[int] = mapped_column(
-        ForeignKey("loans.id", ondelete="CASCADE"), 
-        nullable=False, 
-        index=True
-    )
-    
-    suggested_settlement_percentage: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False) # target payout ratio e.g., 40.00%
-    risk_score: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False, default=0.00) # numerical risk assessment score
-    risk_category: Mapped[str] = mapped_column(String(50), nullable=False) # Low, Medium, High risk of lawsuit/rejection
-    final_offer_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False) # absolute dollar target
-    
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), 
-        server_default=func.now(), 
-        nullable=False
-    )
+class SettlementRecommendation(Base):
+    __tablename__ = "settlement_recommendations"
 
-    # Relationships
-    loan: Mapped["Loan"] = relationship(back_populates="settlements")
-
-    def __repr__(self) -> str:
-        return f"<Settlement(id={self.id}, loan_id={self.loan_id}, risk_category='{self.risk_category}')>"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    loan_id = Column(Integer, ForeignKey("loans.id"), nullable=False)
+    recommended_settlement_amount = Column(Float, nullable=False)
+    settlement_percentage = Column(Float, nullable=False)
+    savings_amount = Column(Float, nullable=False)
+    rationale = Column(Text, nullable=True)
+    risk_factors = Column(JSON, nullable=True)
+    ai_analysis = Column(Text, nullable=True)
+    repayment_plan_months = Column(Integer, nullable=True)
+    is_accepted = Column(Integer, default=0)  # 0=pending, 1=accepted, 2=rejected
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

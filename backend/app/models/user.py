@@ -1,41 +1,22 @@
-from typing import List, Optional
-from decimal import Decimal
-from sqlalchemy import String, Numeric
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.base import Base, TimestampMixin
+"""User model for authentication and profile."""
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from app.database import Base
 
-class User(Base, TimestampMixin):
-    """Represents a platform user account containing login credentials and monthly budget figures."""
+
+class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    
-    # Financial profile core metrics
-    monthly_income: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=0.00)
-    monthly_expenses: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=0.00)
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(120), unique=True, index=True, nullable=False)
+    username = Column(String(50), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(128), nullable=False)
+    full_name = Column(String(100), nullable=True)
+    phone = Column(String(20), nullable=True)
+    monthly_income = Column(Integer, nullable=True)  # in INR
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationships
-    # One-to-One: User <-> FinancialProfile
-    financial_profile: Mapped[Optional["FinancialProfile"]] = relationship(
-        back_populates="user", 
-        cascade="all, delete-orphan", 
-        uselist=False
-    )
-    
-    # One-to-Many: User <-> Loans
-    loans: Mapped[List["Loan"]] = relationship(
-        back_populates="user", 
-        cascade="all, delete-orphan"
-    )
-    
-    # One-to-Many: User <-> AIHistories
-    ai_histories: Mapped[List["AIHistory"]] = relationship(
-        back_populates="user", 
-        cascade="all, delete-orphan"
-    )
-
-    def __repr__(self) -> str:
-        return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"
+    loans = relationship("Loan", back_populates="user", cascade="all, delete-orphan")

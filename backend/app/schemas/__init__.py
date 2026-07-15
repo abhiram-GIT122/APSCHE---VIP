@@ -1,53 +1,15 @@
-from app.schemas.user import UserBase, UserCreate, UserUpdate, UserResponse
-from app.schemas.financial_profile import (
-    FinancialProfileBase,
-    FinancialProfileCreate,
-    FinancialProfileUpdate,
-    FinancialProfileResponse,
-)
-from app.schemas.loan import LoanBase, LoanCreate, LoanUpdate, LoanResponse
-from app.schemas.settlement_prediction import (
-    SettlementPredictionBase,
-    SettlementPredictionCreate,
-    SettlementPredictionUpdate,
-    SettlementPredictionResponse,
-)
-from app.schemas.ai_negotiation import (
-    AINegotiationBase,
-    AINegotiationCreate,
-    AINegotiationUpdate,
-    AINegotiationResponse,
-)
-from app.schemas.ai_history import (
-    AIHistoryBase,
-    AIHistoryCreate,
-    AIHistoryUpdate,
-    AIHistoryResponse,
-)
+from app.schemas.user import UserCreate, UserResponse, UserLogin, UserUpdate
+from app.schemas.loan import LoanCreate, LoanResponse, LoanUpdate
+from app.schemas.financial import FinancialProfileResponse, FinancialAnalysis
+from app.schemas.negotiation import NegotiationCreate, NegotiationResponse
+from app.schemas.settlement import SettlementCreate, SettlementResponse
+from app.schemas.auth import Token, TokenData
 
 __all__ = [
-    "UserBase",
-    "UserCreate",
-    "UserUpdate",
-    "UserResponse",
-    "FinancialProfileBase",
-    "FinancialProfileCreate",
-    "FinancialProfileUpdate",
-    "FinancialProfileResponse",
-    "LoanBase",
-    "LoanCreate",
-    "LoanUpdate",
-    "LoanResponse",
-    "SettlementPredictionBase",
-    "SettlementPredictionCreate",
-    "SettlementPredictionUpdate",
-    "SettlementPredictionResponse",
-    "AINegotiationBase",
-    "AINegotiationCreate",
-    "AINegotiationUpdate",
-    "AINegotiationResponse",
-    "AIHistoryBase",
-    "AIHistoryCreate",
-    "AIHistoryUpdate",
-    "AIHistoryResponse",
+    "UserCreate", "UserResponse", "UserLogin", "UserUpdate",
+    "LoanCreate", "LoanResponse", "LoanUpdate",
+    "FinancialProfileResponse", "FinancialAnalysis",
+    "NegotiationCreate", "NegotiationResponse",
+    "SettlementCreate", "SettlementResponse",
+    "Token", "TokenData",
 ]

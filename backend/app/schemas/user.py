@@ -1,32 +1,36 @@
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
-class UserBase(BaseModel):
-    """Shared base properties for User validations."""
-    name: str = Field(..., min_length=1, max_length=100, description="Full name of the user")
-    email: EmailStr = Field(..., description="Unique email address")
-    monthly_income: Decimal = Field(default=Decimal("0.00"), ge=0, description="Monthly income in USD")
-    monthly_expenses: Decimal = Field(default=Decimal("0.00"), ge=0, description="Monthly fixed expenses in USD")
 
-class UserCreate(UserBase):
-    """Schema for validating user registration inputs."""
-    password: str = Field(..., min_length=8, max_length=100, description="User password (min 8 chars)")
+class UserCreate(BaseModel):
+    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=6)
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    monthly_income: Optional[int] = Field(None, ge=0)
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
 
 class UserUpdate(BaseModel):
-    """Schema for validating user profile update inputs. All fields are optional."""
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    email: Optional[EmailStr] = None
-    monthly_income: Optional[Decimal] = Field(None, ge=0)
-    monthly_expenses: Optional[Decimal] = Field(None, ge=0)
-    password: Optional[str] = Field(None, min_length=8, max_length=100)
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    monthly_income: Optional[int] = Field(None, ge=0)
 
-class UserResponse(UserBase):
-    """Schema for serializing user records in API responses."""
+
+class UserResponse(BaseModel):
     id: int
-    created_at: datetime
-    updated_at: datetime
+    email: str
+    username: str
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    monthly_income: Optional[int] = None
+    is_active: bool
+    created_at: Optional[datetime] = None
 
-    # Enable ORM attribute loading
-    model_config = ConfigDict(from_attributes=True)
+    model_config = {"from_attributes": True}

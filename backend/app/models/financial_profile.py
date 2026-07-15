@@ -1,36 +1,20 @@
-from datetime import datetime
-from decimal import Decimal
-from sqlalchemy import ForeignKey, String, Numeric, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.base import Base
+"""Financial profile model for aggregated user financial health data."""
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, JSON
+from sqlalchemy.sql import func
+from app.database import Base
+
 
 class FinancialProfile(Base):
-    """Represents calculated financial ratios and stress index levels linked to a single user."""
     __tablename__ = "financial_profiles"
 
-    profile_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), 
-        unique=True, 
-        nullable=False, 
-        index=True
-    )
-    
-    # Financial Ratios
-    emi_ratio: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False, default=0.00) # EMI-to-Income percentage
-    dti_ratio: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False, default=0.00) # Debt-to-Income percentage
-    monthly_surplus: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=0.00) # surplus cash flow
-    stress_level: Mapped[str] = mapped_column(String(50), nullable=False, default="Low") # Low, Moderate, Severe, Critical
-    
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), 
-        server_default=func.now(), 
-        onupdate=func.now(), 
-        nullable=False
-    )
-
-    # Relationships
-    user: Mapped["User"] = relationship(back_populates="financial_profile")
-
-    def __repr__(self) -> str:
-        return f"<FinancialProfile(profile_id={self.profile_id}, user_id={self.user_id}, stress_level='{self.stress_level}')>"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    total_debt = Column(Float, default=0.0)
+    total_emi = Column(Float, default=0.0)
+    emi_to_income_ratio = Column(Float, default=0.0)  # percentage
+    monthly_surplus = Column(Float, default=0.0)
+    debt_stress_level = Column(String(20), default="LOW")  # LOW, MODERATE, HIGH, CRITICAL
+    credit_score_estimate = Column(Integer, nullable=True)
+    settlement_readiness_score = Column(Float, nullable=True)
+    ai_insights = Column(JSON, nullable=True)  # AI-generated insights as JSON
+    last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
